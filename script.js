@@ -48,13 +48,13 @@ function spawnFallingItem() {
   const img = document.createElement("img");
   // Handle filename typos
   const insideFileMap = {
-    hotdog: "hotdog-inside.svg",
-    taco: "taco-inside.svg",
-    burrito: "burrito-inside.svg",
-    falafel: "falafel-inside.svg",
-    sandwich: "sandwhich-inside.svg", // Note: typo in filename
+    hotdog: "assets/dishes/hotdog/hotdog-inside.svg",
+    taco: "assets/dishes/taco/taco-inside.svg",
+    burrito: "assets/dishes/burrito/burrito-inside.svg",
+    falafel: "assets/dishes/falafel/falafel-inside.svg",
+    sandwich: "assets/dishes/sandwich/sandwhich-inside.svg", // Note: typo in filename
   };
-  img.src = `assets/${insideFileMap[type]}`;
+  img.src = insideFileMap[type];
   img.alt = `${type} inside`;
   item.appendChild(img);
 
@@ -205,10 +205,34 @@ function handleDrop(e) {
   }
 }
 
+// Play a random munch sound occasionally
+function playMunchSound() {
+  // 40% chance to play a munch sound
+  if (Math.random() < 0.4) {
+    const munchSounds = [
+      "assets/sound/munch_1.mp3",
+      "assets/sound/munch_2.mp3",
+      "assets/sound/munch_3.mp3",
+      "assets/sound/munch_4.mp3",
+    ];
+    const randomSound =
+      munchSounds[Math.floor(Math.random() * munchSounds.length)];
+    const audio = new Audio(randomSound);
+    audio.volume = 0.5; // Set volume to 50%
+    audio.play().catch((error) => {
+      // Ignore audio play errors (e.g., user hasn't interacted with page yet)
+      console.log("Could not play munch sound:", error);
+    });
+  }
+}
+
 function handleMatch(item) {
   // Update score
   gameState.score[item.type]++;
   updateScore();
+
+  // Play munch sound occasionally
+  playMunchSound();
 
   // Create match effect
   const matchEffect = document.createElement("div");
@@ -223,13 +247,13 @@ function handleMatch(item) {
   const img = document.createElement("img");
   // Map dish types to their full SVG files
   const fullFileMap = {
-    hotdog: "hotdog-full.svg",
-    taco: "taco-full.svg",
-    burrito: "burrito-full.svg",
-    falafel: "falafel-full.svg",
-    sandwich: "sandwich-full.svg",
+    hotdog: "assets/dishes/hotdog/hotdog-full.svg",
+    taco: "assets/dishes/taco/taco-full.svg",
+    burrito: "assets/dishes/burrito/burrito-full.svg",
+    falafel: "assets/dishes/falafel/falafel-full.svg",
+    sandwich: "assets/dishes/sandwich/sandwich-full.svg",
   };
-  img.src = `assets/${fullFileMap[item.type]}`;
+  img.src = fullFileMap[item.type];
   matchEffect.appendChild(img);
   gameState.gameArea.appendChild(matchEffect);
 
