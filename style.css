@@ -75,7 +75,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
   padding: 20px;
   background: rgba(240, 240, 240, 0.95);
   border-top: 2px solid #ddd;

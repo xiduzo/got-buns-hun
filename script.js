@@ -3,6 +3,9 @@ const gameState = {
   score: {
     hotdog: 0,
     taco: 0,
+    burrito: 0,
+    falafel: 0,
+    sandwich: 0,
   },
   fallingItems: [],
   draggedItem: null,
@@ -35,7 +38,7 @@ function initGame() {
 
 // Spawn a random falling item from a random side
 function spawnFallingItem() {
-  const types = ["hotdog", "taco"];
+  const types = ["hotdog", "taco", "burrito", "falafel", "sandwich"];
   const type = types[Math.floor(Math.random() * types.length)];
 
   const item = document.createElement("div");
@@ -43,7 +46,15 @@ function spawnFallingItem() {
   item.dataset.type = type;
 
   const img = document.createElement("img");
-  img.src = `assets/${type}-inside.svg`;
+  // Handle filename typos
+  const insideFileMap = {
+    hotdog: "hotdog-inside.svg",
+    taco: "taco-inside.svg",
+    burrito: "burrito-inside.svg",
+    falafel: "falafel-inside.svg",
+    sandwich: "sandwhich-inside.svg", // Note: typo in filename
+  };
+  img.src = `assets/${insideFileMap[type]}`;
   img.alt = `${type} inside`;
   item.appendChild(img);
 
@@ -210,8 +221,15 @@ function handleMatch(item) {
   matchEffect.style.pointerEvents = "none";
 
   const img = document.createElement("img");
-  img.src =
-    item.type === "hotdog" ? "assets/hotdog.svg" : "assets/taco-full.svg";
+  // Map dish types to their full SVG files
+  const fullFileMap = {
+    hotdog: "hotdog-full.svg",
+    taco: "taco-full.svg",
+    burrito: "burrito-full.svg",
+    falafel: "falafel-full.svg",
+    sandwich: "sandwich-full.svg",
+  };
+  img.src = `assets/${fullFileMap[item.type]}`;
   matchEffect.appendChild(img);
   gameState.gameArea.appendChild(matchEffect);
 
@@ -232,6 +250,15 @@ function updateScore() {
   document.getElementById(
     "taco-score"
   ).textContent = `x${gameState.score.taco}`;
+  document.getElementById(
+    "burrito-score"
+  ).textContent = `x${gameState.score.burrito}`;
+  document.getElementById(
+    "falafel-score"
+  ).textContent = `x${gameState.score.falafel}`;
+  document.getElementById(
+    "sandwich-score"
+  ).textContent = `x${gameState.score.sandwich}`;
 }
 
 // Initialize when page loads
