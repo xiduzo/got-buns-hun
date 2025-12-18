@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hotdog Game</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="game-container">
+      <div class="score-display">
+        <div class="score-item">
+          <img src="assets/taco-full.svg" alt="Taco" />
+          <span id="taco-score">x0</span>
+        </div>
+        <div class="score-item">
+          <img src="assets/hotdog.svg" alt="Hotdog" />
+          <span id="hotdog-score">x0</span>
+        </div>
+      </div>
+
+      <div class="game-area" id="gameArea">
+        <!-- Falling insides will be dynamically added here -->
+      </div>
+
+      <div class="bun-container">
+        <div class="bun-item" draggable="true" data-type="hotdog">
+          <img src="assets/hotdog-outside.svg" alt="Hotdog Bun" />
+        </div>
+        <div class="bun-item" draggable="true" data-type="taco">
+          <img src="assets/taco-outside.svg" alt="Taco Shell" />
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
