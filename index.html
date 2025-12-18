@@ -21,6 +21,7 @@
     </div>
 
     <div class="game-container">
+      <div class="timer-display" id="timer">1:00</div>
       <div class="score-display">
         <div class="score-item">
           <img src="assets/dishes/taco/taco-full.svg" alt="Taco" />
@@ -73,6 +74,35 @@
             alt="Sandwich Bread"
           />
         </div>
+      </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div class="game-over-screen hidden" id="gameOverScreen">
+      <div class="game-over-dialog">
+        <h1 class="game-over-title">🎉 Time's Up! 🎉</h1>
+        <p class="game-over-text">
+          You have served
+          <span id="totalScore" class="total-score">0</span> buns!
+        </p>
+
+        <div class="highscore-section">
+          <h2 class="highscore-title">Highscores</h2>
+          <div class="highscore-list" id="highscoreList"></div>
+        </div>
+
+        <div class="name-input-section">
+          <input
+            type="text"
+            id="playerName"
+            class="name-input"
+            placeholder="Enter your name"
+            maxlength="20"
+          />
+          <button class="submit-button" id="submitScore">Submit Score</button>
+        </div>
+
+        <button class="restart-button" id="restartButton">Play Again</button>
       </div>
     </div>
 

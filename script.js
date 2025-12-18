@@ -11,11 +11,26 @@ const gameState = {
   draggedItem: null,
   gameArea: null,
   spawnInterval: null,
+  gameTimer: null,
+  timeRemaining: 60, // 60 seconds = 1 minute
+  isGameActive: false,
 };
 
 // Initialize game
 function initGame() {
   gameState.gameArea = document.getElementById("gameArea");
+  gameState.isGameActive = true;
+  gameState.timeRemaining = 60;
+
+  // Reset scores
+  gameState.score = {
+    hotdog: 0,
+    taco: 0,
+    burrito: 0,
+    falafel: 0,
+    sandwich: 0,
+  };
+  updateScore();
 
   // Set up drag and drop for bun items
   const bunItems = document.querySelectorAll(".bun-item");
@@ -32,12 +47,140 @@ function initGame() {
   spawnFallingItem();
   gameState.spawnInterval = setInterval(spawnFallingItem, 2000);
 
+  // Start timer
+  startTimer();
+
   // Start game loop
   gameLoop();
 }
 
+// Start the game timer
+function startTimer() {
+  updateTimerDisplay();
+  gameState.gameTimer = setInterval(() => {
+    gameState.timeRemaining--;
+    updateTimerDisplay();
+
+    if (gameState.timeRemaining <= 0) {
+      endGame();
+    }
+  }, 1000);
+}
+
+// Update timer display
+function updateTimerDisplay() {
+  const timerElement = document.getElementById("timer");
+  if (timerElement) {
+    const minutes = Math.floor(gameState.timeRemaining / 60);
+    const seconds = gameState.timeRemaining % 60;
+    timerElement.textContent = `${minutes}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
+  }
+}
+
+// End the game
+function endGame() {
+  gameState.isGameActive = false;
+
+  // Stop spawning items
+  if (gameState.spawnInterval) {
+    clearInterval(gameState.spawnInterval);
+    gameState.spawnInterval = null;
+  }
+
+  // Stop timer
+  if (gameState.gameTimer) {
+    clearInterval(gameState.gameTimer);
+    gameState.gameTimer = null;
+  }
+
+  // Calculate total score
+  const totalScore = Object.values(gameState.score).reduce(
+    (sum, val) => sum + val,
+    0
+  );
+
+  // Show game over screen
+  showGameOverScreen(totalScore);
+}
+
+// Store current game score for submission
+let currentGameScore = 0;
+
+// Show game over screen
+function showGameOverScreen(totalScore) {
+  const gameOverScreen = document.getElementById("gameOverScreen");
+  const totalScoreElement = document.getElementById("totalScore");
+  const nameInput = document.getElementById("playerName");
+
+  currentGameScore = totalScore;
+  totalScoreElement.textContent = totalScore;
+  gameOverScreen.classList.remove("hidden");
+  nameInput.value = ""; // Clear previous input
+  nameInput.focus(); // Focus on input for better UX
+
+  // Load and display highscores
+  displayHighscores();
+}
+
+// Save highscore to localStorage
+function saveHighscore(name, score) {
+  let highscores = JSON.parse(localStorage.getItem("hotdogHighscores") || "[]");
+  highscores.push({ name, score, date: new Date().toISOString() });
+
+  // Sort by score (descending) and keep top 10
+  highscores.sort((a, b) => b.score - a.score);
+  highscores = highscores.slice(0, 10);
+
+  localStorage.setItem("hotdogHighscores", JSON.stringify(highscores));
+}
+
+// Display highscores
+function displayHighscores() {
+  const highscoreList = document.getElementById("highscoreList");
+  const highscores = JSON.parse(
+    localStorage.getItem("hotdogHighscores") || "[]"
+  );
+
+  if (highscores.length === 0) {
+    highscoreList.innerHTML =
+      "<p class='no-highscores'>No highscores yet. Be the first!</p>";
+    return;
+  }
+
+  highscoreList.innerHTML = highscores
+    .map((entry, index) => {
+      return `
+        <div class="highscore-item">
+          <span class="highscore-rank">${index + 1}.</span>
+          <span class="highscore-name">${entry.name}</span>
+          <span class="highscore-score">${entry.score}</span>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+// Restart game
+function restartGame() {
+  const gameOverScreen = document.getElementById("gameOverScreen");
+  gameOverScreen.classList.add("hidden");
+
+  // Clear all falling items
+  gameState.fallingItems.forEach((item) => {
+    if (item.element) item.element.remove();
+  });
+  gameState.fallingItems = [];
+
+  // Reinitialize game
+  initGame();
+}
+
 // Spawn a random falling item from a random side
 function spawnFallingItem() {
+  if (!gameState.isGameActive) return;
+
   const types = ["hotdog", "taco", "burrito", "falafel", "sandwich"];
   const type = types[Math.floor(Math.random() * types.length)];
 
@@ -112,6 +255,8 @@ function spawnFallingItem() {
 
 // Game loop to animate falling items
 function gameLoop() {
+  if (!gameState.isGameActive) return;
+
   const gameAreaRect = gameState.gameArea.getBoundingClientRect();
 
   gameState.fallingItems.forEach((item, index) => {
@@ -171,7 +316,7 @@ function handleDragOver(e) {
 function handleDrop(e) {
   e.preventDefault();
 
-  if (!gameState.draggedItem) return;
+  if (!gameState.draggedItem || !gameState.isGameActive) return;
 
   const dropX = e.clientX - gameState.gameArea.getBoundingClientRect().left;
   const dropY = e.clientY - gameState.gameArea.getBoundingClientRect().top;
@@ -299,6 +444,9 @@ function updateScore() {
 window.addEventListener("load", () => {
   const introScreen = document.getElementById("introScreen");
   const startButton = document.getElementById("startButton");
+  const restartButton = document.getElementById("restartButton");
+  const submitButton = document.getElementById("submitScore");
+  const nameInput = document.getElementById("playerName");
 
   // Start game when button is clicked
   startButton.addEventListener("click", () => {
@@ -306,4 +454,30 @@ window.addEventListener("load", () => {
     introScreen.classList.add("hidden");
     initGame();
   });
+
+  // Set up restart button
+  if (restartButton) {
+    restartButton.addEventListener("click", () => {
+      restartGame();
+    });
+  }
+
+  // Set up submit score button
+  if (submitButton) {
+    submitButton.addEventListener("click", () => {
+      const playerName = nameInput.value.trim() || "Anonymous";
+      saveHighscore(playerName, currentGameScore);
+      displayHighscores();
+      nameInput.value = "";
+    });
+  }
+
+  // Allow Enter key to submit
+  if (nameInput) {
+    nameInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter" && submitButton) {
+        submitButton.click();
+      }
+    });
+  }
 });
