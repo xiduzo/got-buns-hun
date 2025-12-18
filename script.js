@@ -205,6 +205,16 @@ function handleDrop(e) {
   }
 }
 
+// Play the oh_yeah sound when game starts
+function playOhYeahSound() {
+  const audio = new Audio("assets/sound/oh_yeah.mp3");
+  audio.volume = 0.7; // Set volume to 70%
+  audio.play().catch((error) => {
+    // Ignore audio play errors
+    console.log("Could not play oh_yeah sound:", error);
+  });
+}
+
 // Play a random munch sound occasionally
 function playMunchSound() {
   // 40% chance to play a munch sound
@@ -285,5 +295,15 @@ function updateScore() {
   ).textContent = `x${gameState.score.sandwich}`;
 }
 
-// Initialize when page loads
-window.addEventListener("load", initGame);
+// Show intro screen on page load
+window.addEventListener("load", () => {
+  const introScreen = document.getElementById("introScreen");
+  const startButton = document.getElementById("startButton");
+
+  // Start game when button is clicked
+  startButton.addEventListener("click", () => {
+    playOhYeahSound();
+    introScreen.classList.add("hidden");
+    initGame();
+  });
+});
