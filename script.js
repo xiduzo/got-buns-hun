@@ -167,6 +167,9 @@ function restartGame() {
   const gameOverScreen = document.getElementById("gameOverScreen");
   gameOverScreen.classList.add("hidden");
 
+  // Play oh yeah sound
+  playOhYeahSound();
+
   // Clear all falling items
   gameState.fallingItems.forEach((item) => {
     if (item.element) item.element.remove();
